@@ -1,8 +1,8 @@
-FROM python:3.12-slim
+FROM python:3.12-alpine
 
 WORKDIR /app
 
-RUN useradd -m appuser
+RUN adduser -D -H -u 10001 appuser
 USER appuser
 COPY app/ ./app/
 EXPOSE 8080
