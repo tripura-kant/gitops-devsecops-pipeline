@@ -1,0 +1,1 @@
+End-to-end DevSecOps pipeline with GitOps-based deployment on Kubernetes. Includes automated security scanning in CI, ArgoCD-driven delivery, and Prometheus/Grafana monitoring with alerting for fast failure detection.
