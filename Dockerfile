@@ -1,8 +1,9 @@
-FROM python:3.x-slim
-ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
+FROM python:3.12-alpine
+
 WORKDIR /app
+
 RUN adduser -D -H -u 10001 appuser
-COPY --chown=appuser:appuser app/ ./app/
-USER 10001
+USER appuser
+COPY app/ ./app/
 EXPOSE 8080
 CMD ["python", "app/app.py"]
