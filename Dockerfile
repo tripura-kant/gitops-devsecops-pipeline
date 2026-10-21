@@ -1,4 +1,4 @@
-FROM python:3.12-alpine
+FROM python:3.x-slim
 ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
 WORKDIR /app
 RUN adduser -D -H -u 10001 appuser
