@@ -12,14 +12,15 @@ spec:
     spec:
       securityContext:
         runAsNonRoot: true
+        runAsUser: 10001
       containers:
         - name: memory-app
-          image: ghcr.io/tripura-kant/gitops-devsecops-pipeline:initial
+          image: memory-app:local
           ports:
             - containerPort: 8080
           resources:
-            requests: { memory: 64Mi, cpu: 50m }
-            limits: { memory: 256Mi, cpu: 200m }
+            requests: { memory: 512Mi, cpu: 50m }
+            limits: { memory: 700Mi, cpu: 200m }
           readinessProbe:
             httpGet: { path: /healthcheck, port: 8080 }
           livenessProbe:
