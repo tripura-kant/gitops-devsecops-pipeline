@@ -81,6 +81,7 @@ jobs:
   k8s-validate:
     needs: docker
     runs-on: ubuntu-latest
+    if: ${{ secrets.KUBECONFIG != '' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
