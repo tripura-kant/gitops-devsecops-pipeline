@@ -6,7 +6,7 @@ from http.server import HTTPServer
 
 import pytest
 
-from app.app import HealthCheckHandler
+from app import HealthCheckHandler
 
 
 @pytest.fixture(scope="module")
