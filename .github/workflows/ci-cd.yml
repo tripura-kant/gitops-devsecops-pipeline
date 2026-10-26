@@ -79,18 +79,13 @@ jobs:
           cache-to: type=gha,mode=max
 
   k8s-validate:
-    needs: docker
+    needs: lint-and-test
     runs-on: ubuntu-latest
-    if: ${{ secrets.KUBECONFIG != '' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up kubectl
-        uses: azure/k8s-set-context@v4
-        with:
-          kubeconfig: ${{ secrets.KUBECONFIG }}
-
-      - name: Validate Kubernetes manifests
+      - name: Validate Kubernetes manifests (offline)
         run: |
-          kubectl apply --dry-run=client -f k8s/
+          curl -sSfL https://github.com/yannh/kubeconform/releases/download/v0.6.7/kubeconform-linux-amd64.tar.gz | tar xz kubeconform
+          ./kubeconform -strict -summary k8s/
