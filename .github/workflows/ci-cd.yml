@@ -36,6 +36,14 @@ jobs:
       - name: Run tests (pytest)
         run: pytest tests/ -v
 
+      - name: Trivy scan (Dockerfile and k8s manifests)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: config
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+
   docker:
     needs: lint-and-test
     runs-on: ubuntu-latest
@@ -68,7 +76,24 @@ jobs:
             type=sha,prefix={{branch}}-
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Build and push Docker image
+      - name: Build image (not pushed yet)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: scan-target:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Trivy scan (image vulnerabilities)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: scan-target:latest
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
+
+      - name: Push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -79,18 +104,13 @@ jobs:
           cache-to: type=gha,mode=max
 
   k8s-validate:
-    needs: docker
+    needs: lint-and-test
     runs-on: ubuntu-latest
-    if: ${{ secrets.KUBECONFIG != '' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up kubectl
-        uses: azure/k8s-set-context@v4
-        with:
-          kubeconfig: ${{ secrets.KUBECONFIG }}
-
-      - name: Validate Kubernetes manifests
+      - name: Validate Kubernetes manifests (offline)
         run: |
-          kubectl apply --dry-run=client -f k8s/
+          curl -sSfL https://github.com/yannh/kubeconform/releases/download/v0.6.7/kubeconform-linux-amd64.tar.gz | tar xz kubeconform
+          ./kubeconform -strict -summary k8s/      
